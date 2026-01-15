@@ -225,22 +225,26 @@ export default function Home() {
                 <div className={styles.topBar}>
                   {chapter.id >= 1 && (
                     <div className={styles.barSection}>
-                      <img src="/assets/Tab 11.png" alt="Section 1" className={styles.barImage} />
+                      <img src="/assets/Tab 11.jpg" alt="Section 1" className={styles.barImage} />
+                      {activeChapter >= 1 && <span className={styles.barText}>I. Tilling the Soil</span>}
                     </div>
                   )}
                   {chapter.id >= 2 && (
                     <div className={styles.barSection}>
-                      <img src="/assets/Tab 22.png" alt="Section 2" className={styles.barImage} />
+                      <img src="/assets/Tab 22.jpg" alt="Section 2" className={styles.barImage} />
+                      {activeChapter >= 2 && <span className={styles.barText}>II. The Planting</span>}
                     </div>
                   )}
                   {chapter.id >= 3 && (
                     <div className={styles.barSection}>
-                      <img src="/assets/Tab 11.png" alt="Section 3" className={styles.barImage} />
+                      <img src="/assets/Tab 11.jpg" alt="Section 3" className={styles.barImage} />
+                      {activeChapter >= 3 && <span className={styles.barText}>III. The Nurturing</span>}
                     </div>
                   )}
                   {chapter.id >= 4 && (
                     <div className={styles.barSection}>
-                      <img src="/assets/Tab 22.png" alt="Section 4" className={styles.barImage} />
+                      <img src="/assets/Tab 22.jpg" alt="Section 4" className={styles.barImage} />
+                      {activeChapter >= 4 && <span className={styles.barText}>IV. Growth</span>}
                     </div>
                   )}
                 </div>
