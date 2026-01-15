@@ -55,7 +55,15 @@ const chapters: Chapter[] = [
 export default function Home() {
   const [activeChapter, setActiveChapter] = useState(1)
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([])
+  const activeChapterRef = useRef(activeChapter) // To track active chapter without dependency issues
   const chaptersSectionRef = useRef<HTMLDivElement>(null)
+  const isScrollingRef = useRef(false)
+  const scrollAccumulatorRef = useRef(0)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
+
+  useEffect(() => {
+    activeChapterRef.current = activeChapter
+  }, [activeChapter])
 
   const handleNextChapter = () => {
     if (activeChapter < chapters.length) {
@@ -63,50 +71,51 @@ export default function Home() {
     }
   }
 
-  const handleChapterClick = (chapterId: number) => {
-    setActiveChapter(chapterId)
-  }
-
   // Handle wheel events for chapter transitions
   useEffect(() => {
-    let isScrolling = false
-    let scrollTimeout: NodeJS.Timeout
-
     const handleWheel = (e: WheelEvent) => {
       const chaptersSection = chaptersSectionRef.current
       if (!chaptersSection) return
 
       const sectionRect = chaptersSection.getBoundingClientRect()
-      const inChaptersSection = sectionRect.top <= 0 && sectionRect.bottom > window.innerHeight
+      // Check if section is significantly visible (relaxed buffer to catch fast scrolls)
+      const inChaptersSection = sectionRect.top <= 100 && sectionRect.bottom >= 100
 
       if (inChaptersSection) {
-        // Get the active chapter's content container
-        const activeChapterElement = chapterRefs.current[activeChapter - 1]
-        if (!activeChapterElement) return
-
-        const contentContainer = activeChapterElement.querySelector(`.${styles.chapterContentSticky}`) as HTMLElement
-        if (!contentContainer) return
-
-        const isAtEnd = contentContainer.scrollLeft + contentContainer.clientWidth >= contentContainer.scrollWidth - 5
-        const isAtStart = contentContainer.scrollLeft <= 5
-
         const scrollDirection = e.deltaY > 0 ? 'down' : 'up'
+        const currentChapter = activeChapterRef.current
         
-        // Only change chapter if at the end/start of horizontal scroll and not currently scrolling
-        if (!isScrolling) {
-          // Both scrolling up (at start) and scrolling down (at end) move to next chapter
-          if ((scrollDirection === 'down' && isAtEnd) || (scrollDirection === 'up' && isAtStart)) {
-            if (activeChapter < chapters.length) {
-              e.preventDefault()
-              isScrolling = true
+        // Change chapter based on scroll direction
+        if (!isScrollingRef.current) {
+          // Scrolling down moves to next chapter
+          if (scrollDirection === 'down' && currentChapter < chapters.length) {
+            e.preventDefault()
+            
+            // Accumulate scroll delta
+            scrollAccumulatorRef.current += e.deltaY
+            
+            // Only trigger if threshold is met (e.g., 150px)
+            if (scrollAccumulatorRef.current > 150) {
+              // Snap to section to ensure clean view
+              chaptersSection.scrollIntoView({ behavior: 'smooth' })
+              
+              isScrollingRef.current = true
+              scrollAccumulatorRef.current = 0 // Reset accumulator
+              
               setActiveChapter(prev => Math.min(prev + 1, chapters.length))
               
-              clearTimeout(scrollTimeout)
-              scrollTimeout = setTimeout(() => {
-                isScrolling = false
+              if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+              scrollTimeoutRef.current = setTimeout(() => {
+                isScrollingRef.current = false
               }, 800)
             }
+          } else {
+            // Reset accumulator if scrolling up or at last chapter
+            scrollAccumulatorRef.current = 0
           }
+        } else {
+            // Block extra scrolls during transition
+            e.preventDefault()
         }
       }
     }
@@ -114,9 +123,9 @@ export default function Home() {
     window.addEventListener('wheel', handleWheel, { passive: false })
     return () => {
       window.removeEventListener('wheel', handleWheel)
-      clearTimeout(scrollTimeout)
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
     }
-  }, [activeChapter, chapters.length])
+  }, [chapters.length])
 
   return (
     <div className={styles.pageWrapper}>
