@@ -246,13 +246,13 @@ export default function Home() {
                   )}
                   {chapter.id >= 3 && (
                     <div className={styles.barSection}>
-                      <img src="/assets/Tab 11.jpg" alt="Section 3" className={styles.barImage} />
+                      <img src="/assets/Tab 33.jpg" alt="Section 3" className={styles.barImage} />
                       {activeChapter >= 3 && <span className={styles.barText}>III. The Nurturing</span>}
                     </div>
                   )}
                   {chapter.id >= 4 && (
                     <div className={styles.barSection}>
-                      <img src="/assets/Tab 22.jpg" alt="Section 4" className={styles.barImage} />
+                      <img src="/assets/Tab 44.jpg" alt="Section 4" className={styles.barImage} />
                       {activeChapter >= 4 && <span className={styles.barText}>IV. Growth</span>}
                     </div>
                   )}
