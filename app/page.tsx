@@ -94,24 +94,18 @@ export default function Home() {
         
         // Only change chapter if at the end/start of horizontal scroll and not currently scrolling
         if (!isScrolling) {
-          if (scrollDirection === 'down' && isAtEnd && activeChapter < chapters.length) {
-            e.preventDefault()
-            isScrolling = true
-            setActiveChapter(prev => Math.min(prev + 1, chapters.length))
-            
-            clearTimeout(scrollTimeout)
-            scrollTimeout = setTimeout(() => {
-              isScrolling = false
-            }, 800)
-          } else if (scrollDirection === 'up' && isAtStart && activeChapter > 1) {
-            e.preventDefault()
-            isScrolling = true
-            setActiveChapter(prev => Math.max(prev - 1, 1))
-            
-            clearTimeout(scrollTimeout)
-            scrollTimeout = setTimeout(() => {
-              isScrolling = false
-            }, 800)
+          // Both scrolling up (at start) and scrolling down (at end) move to next chapter
+          if ((scrollDirection === 'down' && isAtEnd) || (scrollDirection === 'up' && isAtStart)) {
+            if (activeChapter < chapters.length) {
+              e.preventDefault()
+              isScrolling = true
+              setActiveChapter(prev => Math.min(prev + 1, chapters.length))
+              
+              clearTimeout(scrollTimeout)
+              scrollTimeout = setTimeout(() => {
+                isScrolling = false
+              }, 800)
+            }
           }
         }
       }
