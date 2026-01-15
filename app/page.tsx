@@ -29,8 +29,26 @@ const chapters: Chapter[] = [
     subtitle: 'Building Connections',
     tabImage: '/assets/Tab 2.png',
     contentImage: '/assets/2.png',
-    gradient: 'linear-gradient(135deg, #B0D313 0%, #6fdc8c 50%, #0FB8C5 100%)',
-    tabGradient: 'linear-gradient(135deg, #B0D313 0%, #0FB8C5 100%)'
+    gradient: 'linear-gradient(135deg, #4dd4d4 0%, #5de8d5 50%, #3ababa 100%)',
+    tabGradient: 'linear-gradient(135deg, #4dd4d4 0%, #3ababa 100%)'
+  },
+  {
+    id: 3,
+    title: 'III. The Nurturing',
+    subtitle: 'Stewarding Donors',
+    tabImage: '/assets/Tab 3.png',
+    contentImage: '/assets/3.png',
+    gradient: 'linear-gradient(135deg, #4dd4d4 0%, #b8e986 50%, #f4d03f 100%)',
+    tabGradient: 'linear-gradient(135deg, #4dd4d4 0%, #3ababa 100%)'
+  },
+  {
+    id: 4,
+    title: 'IV. Growth',
+    subtitle: 'Donors to Champions',
+    tabImage: '/assets/Tab 4.png',
+    contentImage: '/assets/4.png',
+    gradient: 'linear-gradient(135deg, #89b830 0%, #c8d945 50%, #e8eb5a 100%)',
+    tabGradient: 'linear-gradient(135deg, #89b830 0%, #6a9020 100%)'
   }
 ]
 
@@ -41,12 +59,7 @@ export default function Home() {
 
   const handleNextChapter = () => {
     if (activeChapter < chapters.length) {
-      const nextChapter = activeChapter + 1
-      setActiveChapter(nextChapter)
-      // Scroll to the next chapter
-      if (chapterRefs.current[nextChapter - 1]) {
-        chapterRefs.current[nextChapter - 1]?.scrollIntoView({ behavior: 'smooth' })
-      }
+      setActiveChapter(activeChapter + 1)
     }
   }
 
@@ -226,6 +239,16 @@ export default function Home() {
                       <img src="/assets/Tab 22.png" alt="Section 2" className={styles.barImage} />
                     </div>
                   )}
+                  {chapter.id >= 3 && (
+                    <div className={styles.barSection}>
+                      <img src="/assets/Tab 11.png" alt="Section 3" className={styles.barImage} />
+                    </div>
+                  )}
+                  {chapter.id >= 4 && (
+                    <div className={styles.barSection}>
+                      <img src="/assets/Tab 22.png" alt="Section 4" className={styles.barImage} />
+                    </div>
+                  )}
                 </div>
 
                 {/* Top Left Tab */}
@@ -238,20 +261,16 @@ export default function Home() {
                   <div className={styles.scrollContainer}>
                     {/* Chapter Header */}
                     <div className={styles.chapterHeader}>
-                      <p className={styles.chapterLabel}>CHAPTER {chapter.id === 1 ? 'I' : 'II'}: {chapter.id === 1 ? 'TILLING THE SOIL' : 'THE PLANTING'}</p>
+                      <p className={styles.chapterLabel}>
+                        CHAPTER {chapter.id === 1 ? 'I' : chapter.id === 2 ? 'II' : chapter.id === 3 ? 'III' : 'IV'}: {chapter.id === 1 ? 'TILLING THE SOIL' : chapter.id === 2 ? 'THE PLANTING' : chapter.id === 3 ? 'THE NURTURING' : 'GROWTH'}
+                      </p>
                       <h1 className={styles.chapterTitle}>
-                        {chapter.id === 1 ? chapter.subtitle : 'First Donation'}
+                        {chapter.id === 1 ? chapter.subtitle : chapter.id === 2 ? 'First Donation' : chapter.id === 3 ? 'Stewarding Donors' : 'Donors to Champions'}
                       </h1>
                       <p className={styles.chapterDescription}>
-                        {chapter.id === 1 ? (
-                          <>Before you ask for support, it helps to understand who is already around you.<br />
-                          This chapter focuses on mapping your existing network so your fundraising begins<br />
-                          with relationships, not cold outreach.</>
-                        ) : (
-                          <>Before you ask for support, it helps to understand who is already around you.<br />
-                          This chapter focuses on mapping your existing network so your fundraising begins<br />
-                          with relationships, not cold outreach.</>
-                        )}
+                        Before you ask for support, it helps to understand who is already around you.<br />
+                        This chapter focuses on mapping your existing network so your fundraising begins<br />
+                        with relationships, not cold outreach.
                       </p>
                     </div>
 
@@ -322,10 +341,8 @@ export default function Home() {
                           </p>
                         </div>
                       </div>
-                    ) : (
-                      <div className={styles.contentArea}>
-                        {/* Chapter 2 - Scenario Layout */}
-                        {/* Option A - Left */}
+                    ) : chapter.id === 2 ? (
+                      <div className={styles.contentArea}>\n                        {/* Chapter 2 - Scenario Layout */}
                         <div className={styles.optionCard}>
                           <div className={styles.optionBadge}>OPTION A</div>
                           <p className={styles.optionText}>
@@ -335,7 +352,6 @@ export default function Home() {
                           </p>
                         </div>
 
-                        {/* Center Scenario Card */}
                         <div className={styles.scenarioCard}>
                           <p className={styles.scenarioLabel}>SCENARIO 2</p>
                           <p className={styles.scenarioText}>
@@ -353,7 +369,6 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Option B - Right */}
                         <div className={styles.optionCard}>
                           <div className={styles.optionBadge}>OPTION B</div>
                           <p className={styles.optionText}>
@@ -363,7 +378,89 @@ export default function Home() {
                           </p>
                         </div>
                       </div>
-                    )}
+                    ) : chapter.id === 3 ? (
+                      <div className={styles.contentArea}>
+                        {/* Chapter 3 - Scenario Layout */}
+                        <div className={styles.optionCard}>
+                          <div className={styles.optionBadge}>OPTION A</div>
+                          <p className={styles.optionText}>
+                            Reach out only when you<br />
+                            need funds again
+                          </p>
+                        </div>
+
+                        <div className={styles.scenarioCard}>
+                          <p className={styles.scenarioLabel}>SCENARIO 3</p>
+                          <p className={styles.scenarioText}>
+                            Nidhi has already<br />
+                            donated once. Two<br />
+                            months have passed.<br />
+                            What do you do next?
+                          </p>
+                          <div className={styles.scenarioDecoration}>
+                            <div className={styles.decorativeCircles}>
+                              <div className={styles.decorativeCircle}></div>
+                              <div className={styles.decorativeCircle}></div>
+                              <div className={styles.decorativeCircle}></div>
+                            </div>
+                            <div className={styles.decorativeDiamond}></div>
+                          </div>
+                        </div>
+
+                        <div className={styles.optionCard}>
+                          <div className={styles.optionBadge}>OPTION B</div>
+                          <p className={styles.optionText}>
+                            Share impact and invite her<br />
+                            to engage: Updates, events,<br />
+                            conversations - without<br />
+                            asking for money
+                          </p>
+                        </div>
+                      </div>
+                    ) : chapter.id === 4 ? (
+                      <div className={styles.contentArea}>
+                        {/* Chapter 4 - Scenario Layout */}
+                        <div className={styles.optionCard}>
+                          <div className={styles.optionBadge}>OPTION A</div>
+                          <p className={styles.optionText}>
+                            Treat Nidhi like any other<br />
+                            donor and send a<br />
+                            standard appeal
+                          </p>
+                        </div>
+
+                        <div className={styles.scenarioCard}>
+                          <p className={styles.scenarioLabel}>SCENARIO 4</p>
+                          <p className={styles.scenarioText}>
+                            A year has passed. Nidhi<br />
+                            has stayed engaged and<br />
+                            informed. Your annual<br />
+                            crowdfunding campaign<br />
+                            is live. What do you do?
+                          </p>
+                          <div className={styles.scenarioDecoration}>
+                            <div className={styles.decorativeCirclesGrid}>
+                              <div className={styles.decorativeCircle}></div>
+                              <div className={styles.decorativeCircle}></div>
+                              <div className={styles.decorativeCircle}></div>
+                              <div className={styles.decorativeCircle}></div>
+                              <div className={styles.decorativeCircle}></div>
+                              <div className={styles.decorativeCircle}></div>
+                            </div>
+                            <div className={styles.decorativeDiamond}></div>
+                          </div>
+                        </div>
+
+                        <div className={styles.optionCard}>
+                          <div className={styles.optionBadge}>OPTION B</div>
+                          <p className={styles.optionText}>
+                            Invite her to give again - and<br />
+                            share the cause with her<br />
+                            network
+                          </p>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
 
                   {/* Next Chapter Button */}
