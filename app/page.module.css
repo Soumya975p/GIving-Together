@@ -5,8 +5,10 @@
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
   background: #071a28;
 }
 
@@ -164,7 +166,9 @@
   margin-top: -20px;
 }
 
-.leaf1, .leaf2, .leaf3 {
+.leaf1,
+.leaf2,
+.leaf3 {
   width: 30px;
   height: 50px;
   background: linear-gradient(135deg, #7ec8a8 0%, #4a9d7c 100%);
@@ -320,7 +324,7 @@
   border-radius: 24px 24px 0 0;
   position: relative;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     0 -20px 60px rgba(0, 0, 0, 0.4),
     0 -5px 20px rgba(0, 0, 0, 0.2);
   transform: translateZ(0);
@@ -330,16 +334,17 @@
 /* Content area inside panel */
 .chapterContentSticky {
   width: 100%;
-  height: calc(100% - 70px);
-  margin-top: 70px;
+  height: 100%;
   padding: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -373,7 +378,7 @@
   opacity: 0.85;
 }
 
-.topBar > * {
+.topBar>* {
   pointer-events: auto;
 }
 
@@ -454,9 +459,81 @@
   height: 100%;
   border-radius: 0;
   overflow: hidden;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.6s ease;
-  box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tab Section - Top area for tabs */
+.tabSection {
+  height: 50px;
+  width: 100%;
+  position: relative;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.tabContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.horizontalBar {
+  position: absolute;
+  top: 0;
+  height: 60px;
+  background: transparent;
+  border: none;
+  z-index: 0;
+}
+
+.chapterTab {
+  position: absolute;
+  top: 0;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+  /* Increased z-index to ensure it sits on top */
+  pointer-events: auto;
+  /* Enable clicks even if parent is disabled */
+}
+
+.chapterTab:hover {
+  opacity: 0.9;
+}
+
+.tabImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.tabText {
+  position: relative;
+  z-index: 2;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  white-space: nowrap;
+}
+
+/* Content Section - Bottom area for chapter content */
+.contentSection {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  border: 3px solid rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
 }
 
 .chapterPanel.active {
@@ -556,8 +633,10 @@
   flex-direction: row;
   gap: 60px;
   align-items: center;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -968,15 +1047,15 @@
     width: 200px;
     height: 45px;
   }
-  
+
   .tabTitle {
     font-size: 12px;
   }
-  
+
   .chapterTitle {
     font-size: 32px;
   }
-  
+
   .scrollContent {
     padding: 20px 25px;
     gap: 25px;
@@ -989,7 +1068,8 @@
   background: linear-gradient(180deg, #0a2233 0%, #071a28 100%);
   padding: 60px 80px 40px;
   position: relative;
-  z-index: 100; /* Above all chapter stacks */
+  z-index: 100;
+  /* Above all chapter stacks */
 }
 
 .footerContent {
@@ -1241,8 +1321,8 @@
   right: 0;
   height: 80px;
   background-image: radial-gradient(circle, #1eb59a 3px, transparent 3px),
-                    radial-gradient(circle, #b8e986 3px, transparent 3px),
-                    radial-gradient(circle, #3dd9c4 2px, transparent 2px);
+    radial-gradient(circle, #b8e986 3px, transparent 3px),
+    radial-gradient(circle, #3dd9c4 2px, transparent 2px);
   background-size: 40px 40px, 60px 60px, 25px 25px;
   background-position: 0 0, 20px 20px, 10px 10px;
   opacity: 0.6;
