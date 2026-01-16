@@ -38,8 +38,8 @@ const chapters: Chapter[] = [
     subtitle: 'Stewarding Donors',
     tabImage: '/assets/Tab 3.png',
     contentImage: '/assets/3.png',
-    gradient: 'linear-gradient(135deg, #4dd4d4 0%, #b8e986 50%, #f4d03f 100%)',
-    tabGradient: 'linear-gradient(135deg, #4dd4d4 0%, #3ababa 100%)'
+    gradient: 'linear-gradient(180deg, #0FB8C5 0%, #13D9E8 50%, #FFCD86 100%)',
+    tabGradient: 'linear-gradient(180deg, #0FB8C5 0%, #13D9E8 100%)'
   },
   {
     id: 4,
@@ -47,22 +47,59 @@ const chapters: Chapter[] = [
     subtitle: 'Donors to Champions',
     tabImage: '/assets/Tab 4.png',
     contentImage: '/assets/4.png',
-    gradient: 'linear-gradient(135deg, #89b830 0%, #c8d945 50%, #e8eb5a 100%)',
-    tabGradient: 'linear-gradient(135deg, #89b830 0%, #6a9020 100%)'
+    gradient: 'linear-gradient(180deg, #315900 0%, #86A401 25%, #C9CD33 50%, #DCD647 75%, #FFEF3D 100%)',
+    tabGradient: 'linear-gradient(180deg, #315900 0%, #B0D313 100%)'
   }
 ]
 
 export default function Home() {
   const [activeChapter, setActiveChapter] = useState(1)
+  const [scrollProgress, setScrollProgress] = useState(0)
   const chapterRefs = useRef<(HTMLDivElement | null)[]>([])
   const activeChapterRef = useRef(activeChapter) // To track active chapter without dependency issues
   const chaptersSectionRef = useRef<HTMLDivElement>(null)
   const isScrollingRef = useRef(false)
   const scrollAccumulatorRef = useRef(0)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const scrollContainerRefs = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
     activeChapterRef.current = activeChapter
+    
+    // Reset scroll position to left when chapter changes
+    const newScrollContainer = scrollContainerRefs.current[activeChapter - 1]
+    if (newScrollContainer) {
+      newScrollContainer.scrollLeft = 0
+    }
+    setScrollProgress(0)
+  }, [activeChapter])
+
+  // Handle horizontal scroll animation based on scroll position
+  useEffect(() => {
+    const handleContentScroll = () => {
+      const currentScrollContainer = scrollContainerRefs.current[activeChapter - 1]
+      if (!currentScrollContainer) return
+
+      const scrollLeft = currentScrollContainer.scrollLeft
+      const maxScroll = currentScrollContainer.scrollWidth - currentScrollContainer.clientWidth
+      
+      if (maxScroll > 0) {
+        const progress = scrollLeft / maxScroll
+        setScrollProgress(progress)
+      } else {
+        setScrollProgress(0)
+      }
+    }
+
+    const currentScrollContainer = scrollContainerRefs.current[activeChapter - 1]
+    if (currentScrollContainer) {
+      currentScrollContainer.addEventListener('scroll', handleContentScroll)
+      handleContentScroll() // Initial check
+      
+      return () => {
+        currentScrollContainer.removeEventListener('scroll', handleContentScroll)
+      }
+    }
   }, [activeChapter])
 
   const handleNextChapter = () => {
@@ -84,33 +121,93 @@ export default function Home() {
       if (inChaptersSection) {
         const scrollDirection = e.deltaY > 0 ? 'down' : 'up'
         const currentChapter = activeChapterRef.current
+        const currentScrollContainer = scrollContainerRefs.current[currentChapter - 1]
+
+        // Check horizontal scroll capability
+        let isHorizontallyScrolling = false
+        if (currentScrollContainer) {
+            // Check if we can scroll more to the right?
+            // Use a small buffer (e.g. 5px) for float comparisons
+            const maxScrollLeft = currentScrollContainer.scrollWidth - currentScrollContainer.clientWidth
+            const canScrollRight = currentScrollContainer.scrollLeft < maxScrollLeft - 5
+            const canScrollLeft = currentScrollContainer.scrollLeft > 5
+            
+            if (scrollDirection === 'down' && canScrollRight) {
+                e.preventDefault()
+                currentScrollContainer.scrollLeft += e.deltaY
+                isHorizontallyScrolling = true
+                
+                // Reset chapter scroll accumulator because we are scrolling content
+                scrollAccumulatorRef.current = 0 
+                return // Exit, don't change chapter
+            }
+
+            if (scrollDirection === 'up' && canScrollLeft) {
+                 e.preventDefault()
+                 currentScrollContainer.scrollLeft += e.deltaY
+                 isHorizontallyScrolling = true
+                 return 
+            }
+        }
         
         // Change chapter based on scroll direction
-        if (!isScrollingRef.current) {
+        if (!isScrollingRef.current && !isHorizontallyScrolling) {
           // Scrolling down moves to next chapter
           if (scrollDirection === 'down' && currentChapter < chapters.length) {
             e.preventDefault()
             
-            // Accumulate scroll delta
-            scrollAccumulatorRef.current += e.deltaY
+            // Snap to section to ensure clean view
+            chaptersSection.scrollIntoView({ behavior: 'smooth' })
             
-            // Only trigger if threshold is met (e.g., 150px)
-            if (scrollAccumulatorRef.current > 150) {
-              // Snap to section to ensure clean view
-              chaptersSection.scrollIntoView({ behavior: 'smooth' })
-              
-              isScrollingRef.current = true
-              scrollAccumulatorRef.current = 0 // Reset accumulator
-              
-              setActiveChapter(prev => Math.min(prev + 1, chapters.length))
-              
-              if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-              scrollTimeoutRef.current = setTimeout(() => {
-                isScrollingRef.current = false
-              }, 800)
-            }
-          } else {
-            // Reset accumulator if scrolling up or at last chapter
+            isScrollingRef.current = true
+            scrollAccumulatorRef.current = 0
+            
+            // Immediately set next chapter
+            const nextChapter = currentChapter + 1
+            setActiveChapter(nextChapter)
+            
+            // Reset scroll position for new chapter
+            setTimeout(() => {
+              const newScrollContainer = scrollContainerRefs.current[nextChapter - 1]
+              if (newScrollContainer) {
+                newScrollContainer.scrollLeft = 0
+              }
+            }, 0)
+            
+            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+            scrollTimeoutRef.current = setTimeout(() => {
+              isScrollingRef.current = false
+            }, 800)
+          } 
+          // Scrolling up moves to previous chapter
+          else if (scrollDirection === 'up' && currentChapter > 1) {
+            e.preventDefault()
+            
+            // Snap to section to ensure clean view
+            chaptersSection.scrollIntoView({ behavior: 'smooth' })
+            
+            isScrollingRef.current = true
+            scrollAccumulatorRef.current = 0
+            
+            // Immediately set previous chapter
+            const prevChapter = currentChapter - 1
+            setActiveChapter(prevChapter)
+            
+            // Reset scroll position for new chapter
+            setTimeout(() => {
+              const newScrollContainer = scrollContainerRefs.current[prevChapter - 1]
+              if (newScrollContainer) {
+                newScrollContainer.scrollLeft = 0
+              }
+            }, 0)
+            
+            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+            scrollTimeoutRef.current = setTimeout(() => {
+              isScrollingRef.current = false
+            }, 800)
+          }
+          else {
+            // Reset accumulator if at boundaries
             scrollAccumulatorRef.current = 0
           }
         } else {
@@ -204,6 +301,40 @@ export default function Home() {
 
       {/* Chapters Section - Transform-based stacking */}
       <section className={styles.chaptersSection} ref={chaptersSectionRef}>
+        {/* Top Bars - Fixed, outside chapter animations */}
+        {1 <= activeChapter && (
+          <div className={styles.topBar} style={{ zIndex: 2001, opacity: 1 }}>
+            <div className={styles.barSection} onClick={() => setActiveChapter(1)} style={{ cursor: 'pointer', left: '0%' }}>
+              <img src="/assets/Tab ch1.png" alt="Section 1" className={styles.barImage} />
+              {activeChapter === 1 && <span className={styles.barText}>I. Tilling the Soil</span>}
+            </div>
+          </div>
+        )}
+        {2 <= activeChapter && (
+          <div className={styles.topBar} style={{ zIndex: 2002 }}>
+            <div className={styles.barSection} onClick={() => setActiveChapter(2)} style={{ cursor: 'pointer', left: '25%' }}>
+              <img src="/assets/Tab ch2.png" alt="Section 2" className={styles.barImage} />
+              {activeChapter === 2 && <span className={styles.barText}>II. The Planting</span>}
+            </div>
+          </div>
+        )}
+        {3 <= activeChapter && (
+          <div className={styles.topBar} style={{ zIndex: 2003 }}>
+            <div className={styles.barSection} onClick={() => setActiveChapter(3)} style={{ cursor: 'pointer', left: '50%' }}>
+              <img src="/assets/Tab ch3.png" alt="Section 3" className={styles.barImage} />
+              {activeChapter === 3 && <span className={styles.barText}>III. The Nurturing</span>}
+            </div>
+          </div>
+        )}
+        {4 <= activeChapter && (
+          <div className={styles.topBar} style={{ zIndex: 2004 }}>
+            <div className={styles.barSection} onClick={() => setActiveChapter(4)} style={{ cursor: 'pointer', left: '75%' }}>
+              <img src="/assets/Tab ch4.png" alt="Section 4" className={styles.barImage} />
+              {activeChapter === 4 && <span className={styles.barText}>IV. Growth</span>}
+            </div>
+          </div>
+        )}
+
         {chapters.map((chapter, index) => {
           const isActive = activeChapter === chapter.id
           const isPast = activeChapter > chapter.id
@@ -230,42 +361,18 @@ export default function Home() {
                 className={styles.chapterPanel}
                 style={{ background: chapter.gradient }}
               >
-                {/* Top Bar - Shows progressively */}
-                <div className={styles.topBar}>
-                  {chapter.id >= 1 && (
-                    <div className={styles.barSection}>
-                      <img src="/assets/Tab 11.jpg" alt="Section 1" className={styles.barImage} />
-                      {activeChapter >= 1 && <span className={styles.barText}>I. Tilling the Soil</span>}
-                    </div>
-                  )}
-                  {chapter.id >= 2 && (
-                    <div className={styles.barSection}>
-                      <img src="/assets/Tab 22.jpg" alt="Section 2" className={styles.barImage} />
-                      {activeChapter >= 2 && <span className={styles.barText}>II. The Planting</span>}
-                    </div>
-                  )}
-                  {chapter.id >= 3 && (
-                    <div className={styles.barSection}>
-                      <img src="/assets/Tab 33.jpg" alt="Section 3" className={styles.barImage} />
-                      {activeChapter >= 3 && <span className={styles.barText}>III. The Nurturing</span>}
-                    </div>
-                  )}
-                  {chapter.id >= 4 && (
-                    <div className={styles.barSection}>
-                      <img src="/assets/Tab 44.jpg" alt="Section 4" className={styles.barImage} />
-                      {activeChapter >= 4 && <span className={styles.barText}>IV. Growth</span>}
-                    </div>
-                  )}
-                </div>
-
-                {/* Top Left Tab */}
-                <div className={styles.topLeftTab}>
-                  {chapter.title}
-                </div>
-
                 {/* Chapter Content */}
-                <div className={styles.chapterContentSticky}>
-                  <div className={styles.scrollContainer}>
+                <div 
+                  className={styles.chapterContentSticky} 
+                  ref={(el) => { scrollContainerRefs.current[index] = el }}
+                >
+                  <div 
+                    className={styles.scrollContainer}
+                    style={{
+                      transform: isActive ? `translateX(${-100 + (scrollProgress * 100)}px)` : 'translateX(0)',
+                      transition: isActive ? 'none' : 'transform 0.3s ease'
+                    }}
+                  >
                     {/* Chapter Header */}
                     <div className={styles.chapterHeader}>
                       <p className={styles.chapterLabel}>
